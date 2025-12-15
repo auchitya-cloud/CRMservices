@@ -1,0 +1,8 @@
+/Users/auchitya/Desktop/Recruit CRM/stock-service/src/main/java/com/example/stock/StockServiceApplication.java
+/Users/auchitya/Desktop/Recruit CRM/stock-service/src/main/java/com/example/stock/config/DataInitializer.java
+/Users/auchitya/Desktop/Recruit CRM/stock-service/src/main/java/com/example/stock/entity/Product.java
+/Users/auchitya/Desktop/Recruit CRM/stock-service/src/main/java/com/example/stock/entity/StockTransaction.java
+/Users/auchitya/Desktop/Recruit CRM/stock-service/src/main/java/com/example/stock/listener/OrderEventListener.java
+/Users/auchitya/Desktop/Recruit CRM/stock-service/src/main/java/com/example/stock/repository/ProductRepository.java
+/Users/auchitya/Desktop/Recruit CRM/stock-service/src/main/java/com/example/stock/repository/StockTransactionRepository.java
+/Users/auchitya/Desktop/Recruit CRM/stock-service/src/main/java/com/example/stock/service/StockService.java
