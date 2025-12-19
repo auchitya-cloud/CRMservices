@@ -1,13 +1,15 @@
-FROM openjdk:17-jre-slim
+FROM eclipse-temurin:17-jre
 
 WORKDIR /app
 
+# Copy built JAR
 COPY target/order-service-1.0.0.jar app.jar
 
 EXPOSE 8080
 
-# Add OpenTelemetry Java agent
-ADD https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/latest/download/opentelemetry-javaagent.jar /app/opentelemetry-javaagent.jar
+# Download OpenTelemetry agent
+ADD https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/latest/download/opentelemetry-javaagent.jar \
+    /app/opentelemetry-javaagent.jar
 
 ENV JAVA_OPTS="-javaagent:/app/opentelemetry-javaagent.jar"
 
