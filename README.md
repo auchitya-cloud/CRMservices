@@ -61,9 +61,12 @@ A distributed order processing system using Spring Boot microservices and Kafka 
 
 ```bash
 # Start Kafka
-docker-compose up -d kafka zookeeper
+docker-compose up -d 
 
-# Build services
+# Build services from project root:
+cd shared
+mvn clean install
+cd ..
 ./mvnw clean package -DskipTests
 
 # Run services
