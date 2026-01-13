@@ -1,0 +1,147 @@
+# Main Ingress for API and Demo UI
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: order-platform-ingress
+  namespace: order-platform
+spec:
+  ingressClassName: nginx
+  rules:
+  - http:
+      paths:
+      - path: /api/orders
+        pathType: Prefix
+        backend:
+          service:
+            name: order-service
+            port:
+              number: 8085
+      - path: /api/payments
+        pathType: Prefix
+        backend:
+          service:
+            name: payment-service
+            port:
+              number: 8086
+      - path: /api/stocks
+        pathType: Prefix
+        backend:
+          service:
+            name: stock-service
+            port:
+              number: 8087
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: demo-ui
+            port:
+              number: 80
+---
+# Health check ingress with rewrite for order-service
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: health-order-ingress
+  namespace: order-platform
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /actuator/health
+spec:
+  ingressClassName: nginx
+  rules:
+  - http:
+      paths:
+      - path: /actuator/order/health
+        pathType: Exact
+        backend:
+          service:
+            name: order-service
+            port:
+              number: 8085
+---
+# Health check ingress with rewrite for payment-service
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: health-payment-ingress
+  namespace: order-platform
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /actuator/health
+spec:
+  ingressClassName: nginx
+  rules:
+  - http:
+      paths:
+      - path: /actuator/payment/health
+        pathType: Exact
+        backend:
+          service:
+            name: payment-service
+            port:
+              number: 8086
+---
+# Health check ingress with rewrite for stock-service
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: health-stock-ingress
+  namespace: order-platform
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /actuator/health
+spec:
+  ingressClassName: nginx
+  rules:
+  - http:
+      paths:
+      - path: /actuator/stock/health
+        pathType: Exact
+        backend:
+          service:
+            name: stock-service
+            port:
+              number: 8087
+---
+# Kafka UI ingress (no rewrite needed - app configured with context path)
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: kafka-ui-ingress
+  namespace: order-platform
+spec:
+  ingressClassName: nginx
+  rules:
+  - http:
+      paths:
+      - path: /kafka-ui
+        pathType: Prefix
+        backend:
+          service:
+            name: kafka-ui
+            port:
+              number: 8080
+---
+# Monitoring ingress for Prometheus and Grafana
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: monitoring-ingress
+  namespace: order-platform
+spec:
+  ingressClassName: nginx
+  rules:
+  - http:
+      paths:
+      - path: /prometheus
+        pathType: Prefix
+        backend:
+          service:
+            name: prometheus-service
+            port:
+              number: 9090
+      - path: /grafana
+        pathType: Prefix
+        backend:
+          service:
+            name: grafana
+            port:
+              number: 3000

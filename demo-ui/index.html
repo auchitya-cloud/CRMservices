@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kafka Microservices Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .team-info {
+            background: #f8f9fa;
+            padding: 20px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .team-members {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .team-member {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #007bff;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+            padding: 30px;
+        }
+
+        .demo-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            border: 1px solid #e9ecef;
+        }
+
+        .demo-section h3 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.4em;
+        }
+
+        .button-group {
+            display: grid;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .demo-button {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            color: white;
+            border: none;
+            padding: 12px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .demo-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 123, 255, 0.3);
+        }
+
+        .demo-button.success {
+            background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
+        }
+
+        .demo-button.warning {
+            background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
+            color: #212529;
+        }
+
+        .demo-button.danger {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        }
+
+        .api-log {
+            background: #1e1e1e;
+            color: #00ff00;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.8em;
+            height: 300px;
+            overflow-y: auto;
+            margin-top: 15px;
+            border: 2px solid #333;
+        }
+
+        .log-entry {
+            margin-bottom: 8px;
+            padding: 6px;
+            border-left: 3px solid #007bff;
+            background: rgba(0, 123, 255, 0.1);
+        }
+
+        .log-entry.success {
+            border-left-color: #28a745;
+            background: rgba(40, 167, 69, 0.1);
+        }
+
+        .log-entry.error {
+            border-left-color: #dc3545;
+            background: rgba(220, 53, 69, 0.1);
+            color: #ff6b6b;
+        }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .status-card {
+            background: white;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+            text-align: center;
+            font-size: 0.9em;
+        }
+
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 6px;
+        }
+
+        .status-indicator.online {
+            background: #28a745;
+            box-shadow: 0 0 8px rgba(40, 167, 69, 0.5);
+        }
+
+        .status-indicator.offline {
+            background: #dc3545;
+        }
+
+        .status-indicator.loading {
+            background: #ffc107;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        .data-table {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-top: 15px;
+            border: 1px solid #e9ecef;
+        }
+
+        .data-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th {
+            background: #007bff;
+            color: white;
+            padding: 10px;
+            text-align: left;
+            font-size: 0.9em;
+        }
+
+        .data-table td {
+            padding: 8px 10px;
+            border-bottom: 1px solid #e9ecef;
+            font-size: 0.8em;
+        }
+
+        .data-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .order-form {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            border: 1px solid #e9ecef;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+
+        .form-group select,
+        .form-group input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+
+        .architecture-diagram {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .flow-diagram {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .service-box {
+            background: #007bff;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            min-width: 120px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .arrow {
+            font-size: 1.5em;
+            color: #6c757d;
+        }
+
+        @media (max-width: 1200px) {
+            .main-content {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+
+            .flow-diagram {
+                flex-direction: column;
+            }
+
+            .arrow {
+                transform: rotate(90deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Kafka Microservices Platform</h1>
+            <p>Event-Driven Architecture with Database Integration</p>
+        </div>
+        <div class="team-info">
+            <h3>👥 Team Members & Responsibilities</h3>
+            <div class="team-members">
+                <div class="team-member"><strong>Auchitya</strong> - Deploy Spring Services<br><small>Kafka microservices with observability</small></div>
+                <div class="team-member"><strong>Balaji</strong> - DevOps CI/CD<br><small>CI/CD pipelines and infrastructure</small></div>
+                <div class="team-member"><strong>Tharun</strong> - Observability Stack<br><small>Monitoring, logging, and tracing</small></div>
+            </div>
+        </div>
+        <div class="architecture-diagram">
+            <h3>🏗️ System Architecture</h3>
+            <div class="flow-diagram">
+                <div class="service-box">Order Service<br><small>:8080</small></div>
+                <div class="arrow">→</div>
+                <div class="service-box">Kafka<br><small>Events</small></div>
+                <div class="arrow">→</div>
+                <div class="service-box">Payment Service<br><small>:8081</small></div>
+                <div class="arrow">→</div>
+                <div class="service-box">Stock Service<br><small>:8082</small></div>
+            </div>
+            <div style="margin-top: 20px;">
+                <a href="http://98.80.177.133:30080" target="_blank" class="demo-button" style="text-decoration:none;display:inline-block;margin:5px">📊 Kafka UI</a>
+                <a href="http://98.80.177.133:30090" target="_blank" class="demo-button" style="text-decoration:none;display:inline-block;margin:5px">📈 Prometheus</a>
+                <a href="http://98.80.177.133:30030" target="_blank" class="demo-button" style="text-decoration:none;display:inline-block;margin:5px">📉 Grafana</a>
+            </div>
+        </div>
+        <div class="main-content">
+            <div class="demo-section">
+                <h3>🎮 Service Operations</h3>
+                <div class="status-grid">
+                    <div class="status-card"><span class="status-indicator loading" id="order-status"></span>Order</div>
+                    <div class="status-card"><span class="status-indicator loading" id="payment-status"></span>Payment</div>
+                    <div class="status-card"><span class="status-indicator loading" id="stock-status"></span>Stock</div>
+                    <div class="status-card"><span class="status-indicator loading" id="kafka-status"></span>Kafka</div>
+                </div>
+                <div class="button-group">
+                    <button class="demo-button" onclick="checkHealth()">🔍 Check All Services</button>
+                    <button class="demo-button success" onclick="showOrderForm()">📦 Create Order</button>
+                    <button class="demo-button warning" onclick="viewPayments()">💳 View Payments</button>
+                    <button class="demo-button" onclick="viewStock()">📊 View Stock</button>
+                    <button class="demo-button" onclick="refreshBalances()">🔄 Refresh Balances</button>
+                    <button class="demo-button danger" onclick="simulateFailure()">⚠️ Simulate Failure</button>
+                </div>
+                <div class="order-form" id="orderForm" style="display:none;">
+                    <h4>📦 Create New Order</h4>
+                    <div class="form-group">
+                        <label>Customer:</label>
+                        <select id="customerId"></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Product:</label>
+                        <select id="productId" onchange="updateTotal()"></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Quantity:</label>
+                        <input type="number" id="quantity" value="1" min="1" onchange="updateTotal()">
+                    </div>
+                    <div class="form-group">
+                        <label>Total:</label>
+                        <input type="text" id="totalAmount" readonly>
+                    </div>
+                    <button class="demo-button success" onclick="createOrder()" style="width:100%">Submit Order</button>
+                    <button class="demo-button" onclick="hideOrderForm()" style="width:100%;margin-top:10px">Cancel</button>
+                </div>
+            </div>
+            <div class="demo-section">
+                <h3>📊 Database Views</h3>
+                <div class="button-group">
+                    <button class="demo-button" onclick="loadOrders()">📋 Orders</button>
+                    <button class="demo-button" onclick="loadStock()">📦 Stock</button>
+                    <button class="demo-button" onclick="loadCustomers()">👥 Customers</button>
+                    <button class="demo-button" onclick="loadPayments()">💳 Payments</button>
+                </div>
+                <div class="data-table" id="dataTable">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th colspan="4">📊 Data</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dataBody">
+                            <tr>
+                                <td colspan="4" style="text-align:center;padding:20px">Click a button to load data</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="demo-section">
+                <h3>📡 API Monitor</h3>
+                <div class="api-log" id="apiLog">
+                    <div class="log-entry">[SYSTEM] Demo UI ready ✅</div>
+                </div>
+                <button class="demo-button" onclick="clearLog()" style="margin-top:10px;width:100%">🗑️ Clear</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const products = [{
+                id: 'product-1',
+                name: 'Laptop',
+                price: 100
+            },
+            {
+                id: 'product-2',
+                name: 'Mouse',
+                price: 29.99
+            },
+            {
+                id: 'product-3',
+                name: 'Keyboard',
+                price: 79.99
+            },
+            {
+                id: 'product-4',
+                name: 'Monitor',
+                price: 150
+            }
+        ];
+
+        function log(msg, type = 'info') {
+            const el = document.getElementById('apiLog');
+            const time = new Date().toLocaleTimeString();
+            const div = document.createElement('div');
+            div.className = `log-entry ${type}`;
+            div.innerHTML = `[${time}] ${msg}`;
+            el.appendChild(div);
+            el.scrollTop = el.scrollHeight;
+        }
+
+        function setStatus(svc, status) {
+            document.getElementById(svc + '-status').className = `status-indicator ${status}`;
+        }
+
+        async function checkHealth() {
+            log('🔍 Checking services...');
+            const svcs = [{
+                    name: 'order',
+                    url: '/actuator/order/health'
+                },
+                {
+                    name: 'payment',
+                    url: '/actuator/payment/health'
+                },
+                {
+                    name: 'stock',
+                    url: '/actuator/stock/health'
+                }
+            ];
+            for (const s of svcs) {
+                setStatus(s.name, 'loading');
+                try {
+                    const res = await fetch(s.url);
+                    if (res.ok) {
+                        const data = await res.json();
+                        setStatus(s.name, 'online');
+                        log(`✅ ${s.name.toUpperCase()}: ${data.status}`, 'success');
+                    } else {
+                        throw new Error(`HTTP ${res.status}`);
+                    }
+                } catch (e) {
+                    setStatus(s.name, 'offline');
+                    log(`❌ ${s.name.toUpperCase()}: ${e.message}`, 'error');
+                }
+            }
+            setStatus('kafka', 'online');
+            log('✅ KAFKA: Connected', 'success');
+            await loadDropdowns();
+        }
+
+        async function loadDropdowns() {
+            const custSel = document.getElementById('customerId');
+            const prodSel = document.getElementById('productId');
+
+            try {
+                const res = await fetch('/api/payments/accounts');
+                if (res.ok) {
+                    const accounts = await res.json();
+                    custSel.innerHTML = '<option value="">Select Customer</option>';
+                    accounts.forEach(a => {
+                        custSel.innerHTML += `<option value="${a.customerId}">${a.customerId} ($${a.balance.toFixed(2)})</option>`;
+                    });
+                }
+            } catch (e) {
+                custSel.innerHTML = '<option value="">Select</option><option value="customer-1">customer-1</option><option value="customer-2">customer-2</option><option value="customer-3">customer-3</option>';
+            }
+
+            try {
+                const res = await fetch('/api/stocks');
+                if (res.ok) {
+                    const stocks = await res.json();
+                    prodSel.innerHTML = '<option value="">Select Product</option>';
+                    stocks.forEach(s => {
+                        const p = products.find(x => x.id === s.productId);
+                        const price = p ? p.price : 0;
+                        prodSel.innerHTML += `<option value="${s.productId}" data-price="${price}">${s.name} - $${price} (${s.quantity} left)</option>`;
+                    });
+                }
+            } catch (e) {
+                prodSel.innerHTML = '<option value="">Select</option>';
+                products.forEach(p => {
+                    prodSel.innerHTML += `<option value="${p.id}" data-price="${p.price}">${p.name} - $${p.price}</option>`;
+                });
+            }
+        }
+
+        function updateTotal() {
+            const sel = document.getElementById('productId');
+            const opt = sel.options[sel.selectedIndex];
+            const price = parseFloat(opt && opt.dataset && opt.dataset.price ? opt.dataset.price : 0);
+            const qty = parseInt(document.getElementById('quantity').value) || 1;
+            document.getElementById('totalAmount').value = '$$' + (price * qty).toFixed(2);
+        }
+
+        function showOrderForm() {
+            document.getElementById('orderForm').style.display = 'block';
+            loadDropdowns();
+            log('📦 Order form opened');
+        }
+
+        function hideOrderForm() {
+            document.getElementById('orderForm').style.display = 'none';
+        }
+
+        async function createOrder() {
+            const customerId = document.getElementById('customerId').value;
+            const productId = document.getElementById('productId').value;
+            const quantity = parseInt(document.getElementById('quantity').value);
+            const sel = document.getElementById('productId');
+            const selOpt = sel.options[sel.selectedIndex];
+            const price = parseFloat(selOpt && selOpt.dataset && selOpt.dataset.price ? selOpt.dataset.price : 0);
+
+            if (!customerId || !productId) {
+                log('❌ Select customer and product', 'error');
+                return;
+            }
+
+            const order = {
+                customerId,
+                products: {
+                    [productId]: quantity
+                },
+                totalAmount: price * quantity
+            };
+
+            log(`📦 Creating: ${JSON.stringify(order)}`);
+
+            try {
+                const res = await fetch('/api/orders', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(order)
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    log(`✅ Order ${data.orderId} created!`, 'success');
+                    log('📨 Kafka → Payment & Stock services', 'success');
+                    hideOrderForm();
+                    setTimeout(loadDropdowns, 2000);
+                } else {
+                    throw new Error(`HTTP ${res.status}`);
+                }
+            } catch (e) {
+                log(`❌ Failed: ${e.message}`, 'error');
+            }
+        }
+
+        async function viewPayments() {
+            log('💳 Fetching payments...');
+            try {
+                const res = await fetch('/api/payments');
+                if (res.ok) {
+                    const payments = await res.json();
+                    if (payments.length > 0) {
+                        log(`✅ ${payments.length} payments found`, 'success');
+                        payments.slice(-3).forEach(p => log(`  • ${p.transactionId.slice(0,8)}... $${p.amount} ${p.status}`));
+                    } else {
+                        log('ℹ️ No payments yet');
+                    }
+                }
+            } catch (e) {
+                log(`❌ ${e.message}`, 'error');
+            }
+        }
+
+        async function viewStock() {
+            log('📊 Fetching stock...');
+            try {
+                const res = await fetch('/api/stocks');
+                if (res.ok) {
+                    const stocks = await res.json();
+                    log('✅ Stock levels:', 'success');
+                    stocks.forEach(s => log(`  • ${s.name}: ${s.quantity} units`));
+                }
+            } catch (e) {
+                log(`❌ ${e.message}`, 'error');
+            }
+        }
+
+        function simulateFailure() {
+            const svcs = ['order', 'payment', 'stock'];
+            const svc = svcs[Math.floor(Math.random() * svcs.length)];
+            setStatus(svc, 'offline');
+            log(`⚠️ ${svc.toUpperCase()}: Circuit breaker OPEN`, 'error');
+            setTimeout(() => {
+                setStatus(svc, 'online');
+                log(`✅ ${svc.toUpperCase()}: Recovered`, 'success');
+            }, 3000);
+        }
+
+        async function refreshBalances() {
+            log('🔄 Refreshing balances & stock...');
+            await loadDropdowns();
+            log('✅ Dropdowns refreshed with latest data', 'success');
+        }
+
+        async function loadOrders() {
+            log('📋 Loading orders...');
+            const tbody = document.getElementById('dataBody');
+            try {
+                const res = await fetch('/api/orders');
+                if (res.ok) {
+                    const orders = await res.json();
+                    if (orders.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="4">No orders</td></tr>';
+                        return;
+                    }
+                    tbody.innerHTML = orders.map(o =>
+                        `<tr><td>${o.orderId.slice(0,8)}...</td><td>${o.customerId}</td><td>$${o.totalAmount}</td><td>${o.status}</td></tr>`
+                    ).join('');
+                    document.querySelector('#dataTable th').innerHTML = '📋 Orders';
+                    log(`✅ ${orders.length} orders loaded`, 'success');
+                }
+            } catch (e) {
+                log(`❌ ${e.message}`, 'error');
+            }
+        }
+
+        async function loadStock() {
+            log('📦 Loading stock...');
+            const tbody = document.getElementById('dataBody');
+            try {
+                const res = await fetch('/api/stocks');
+                if (res.ok) {
+                    const stocks = await res.json();
+                    tbody.innerHTML = stocks.map(s => {
+                        const p = products.find(x => x.id === s.productId);
+                        return `<tr><td>${s.productId}</td><td>${s.name}</td><td>$${p?.price || 0}</td><td>${s.quantity}</td></tr>`;
+                    }).join('');
+                    document.querySelector('#dataTable th').innerHTML = '📦 Stock';
+                    log(`✅ ${stocks.length} products loaded`, 'success');
+                }
+            } catch (e) {
+                log(`❌ ${e.message}`, 'error');
+            }
+        }
+
+        async function loadCustomers() {
+            log('👥 Loading customers...');
+            const tbody = document.getElementById('dataBody');
+            try {
+                const res = await fetch('/api/payments/accounts');
+                if (res.ok) {
+                    const accounts = await res.json();
+                    tbody.innerHTML = accounts.map(a =>
+                        `<tr><td>${a.customerId}</td><td>-</td><td>-</td><td>$${a.balance.toFixed(2)}</td></tr>`
+                    ).join('');
+                    document.querySelector('#dataTable th').innerHTML = '👥 Customers';
+                    log(`✅ ${accounts.length} customers loaded`, 'success');
+                }
+            } catch (e) {
+                log(`❌ ${e.message}`, 'error');
+            }
+        }
+
+        async function loadPayments() {
+            log('💳 Loading payments...');
+            const tbody = document.getElementById('dataBody');
+            try {
+                const res = await fetch('/api/payments');
+                if (res.ok) {
+                    const payments = await res.json();
+                    if (payments.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="4">No payments</td></tr>';
+                        return;
+                    }
+                    tbody.innerHTML = payments.map(p =>
+                        `<tr><td>${p.transactionId.slice(0,8)}...</td><td>${p.orderId.slice(0,8)}...</td><td>$${p.amount}</td><td>${p.status}</td></tr>`
+                    ).join('');
+                    document.querySelector('#dataTable th').innerHTML = '💳 Payments';
+                    log(`✅ ${payments.length} payments loaded`, 'success');
+                }
+            } catch (e) {
+                log(`❌ ${e.message}`, 'error');
+            }
+        }
+
+        function clearLog() {
+            document.getElementById('apiLog').innerHTML = '<div class="log-entry">[SYSTEM] Log cleared ✅</div>';
+        }
+
+        // Auto-check health on load
+        document.addEventListener('DOMContentLoaded', () => setTimeout(checkHealth, 1500));
+    </script>
+</body>
+
+</html>

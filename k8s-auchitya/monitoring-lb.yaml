@@ -1,0 +1,34 @@
+# Grafana LoadBalancer Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: grafana-lb
+  namespace: auchitya-platform
+  labels:
+    app: grafana
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 80
+      targetPort: 3000
+      protocol: TCP
+  selector:
+    app: grafana
+
+---
+# Prometheus LoadBalancer Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: prometheus-lb
+  namespace: auchitya-platform
+  labels:
+    app: prometheus
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 80
+      targetPort: 9090
+      protocol: TCP
+  selector:
+    app: prometheus
