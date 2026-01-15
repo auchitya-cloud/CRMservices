@@ -44,7 +44,7 @@ pipeline {
         stage("Pushing Images to ECR"){
             steps{
                 withCredentials([
-                    [$class: 'AmazonWebServicesCredentialsGinding',
+                    [$class: 'AmazonWebServicesCredentialsBinding',
                      credentialsId: 'aws-cred',
                     ]
                 ]){
