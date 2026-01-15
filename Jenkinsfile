@@ -75,10 +75,10 @@ pipeline {
                         git config --global --add safe.directory "$WORKSPACE"
                         git config user.email "balaji_from_jenkins@gmail.com"
                         git config user.name "Balaji G"
-                        sed -i "s|image: .*order-service:.*|image: ${ORDER_REPO_URI}:${BUILD_NUMBER}|" k8s/services/order-service.yaml
-                        sed -i "s|image: .*payment-service:.*|image: ${PAYMENT_REPO_URI}:${BUILD_NUMBER}|" k8s/services/payment-service.yaml
-                        sed -i "s|image: .*stock-service:.*|image: ${STOCK_REPO_URI}:${BUILD_NUMBER}|" k8s/services/stock-service.yaml
-                        sed -i "s|image: .*demo-ui:.*|image: ${DEMOUI_REPO_URI}:${BUILD_NUMBER}|" k8s/services/demo-ui.yaml
+                        sed -i "s|image: .*order-service:.*|image: ${ECR_REGISTRY}/order-service:${BUILD_NUMBER}|" k8s/services/order-service.yaml
+                        sed -i "s|image: .*payment-service:.*|image: ${ECR_REGISTRY}/payment-service:${BUILD_NUMBER}|" k8s/services/payment-service.yaml
+                        sed -i "s|image: .*stock-service:.*|image: ${ECR_REGISTRY}/stock-service:${BUILD_NUMBER}|" k8s/services/stock-service.yaml
+                        sed -i "s|image: .*demo-ui:.*|image: ${ECR_REGISTRY}/demo-ui:${BUILD_NUMBER}|" k8s/services/demo-ui.yaml
 
                         git add k8s/services/*.yaml
 
