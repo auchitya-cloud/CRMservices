@@ -91,6 +91,12 @@ pipeline {
     }
     
     post {
+        success {
+            slackSend(channel: '#integrated-final-results', color: '#47ec05', message: "SUCCESS: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' completed. <${env.BUILD_URL}|Open>")
+        }
+        failure {
+            slackSend(channel: '#integrated-final-results', color: '#ec2805', message: "FAILURE: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' failed! <${env.BUILD_URL}|Open>")
+        }
         always {
             cleanWs()
         }
