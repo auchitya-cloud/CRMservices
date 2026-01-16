@@ -2,17 +2,17 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: order-platform
+  name: auchitya-platform
   namespace: argocd
 spec:
   project: default
   source:
-    repoURL: https://github.com/auchitya-cloud/CRMservices.git
+    repoURL: https://github.com/auchitya-cloud/CRMservices
     targetRevision: main
     path: k8s
   destination:
     server: https://kubernetes.default.svc
-    namespace: order-platform
+    namespace: auchitya-platform
   syncPolicy:
     automated:
       prune: true

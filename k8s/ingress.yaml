@@ -1,9 +1,9 @@
-# Main Ingress for API and Demo UI
+# Main Ingress
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: order-platform-ingress
-  namespace: order-platform
+  name: auchitya-ingress
+  namespace: auchitya-platform
 spec:
   ingressClassName: nginx
   rules:
@@ -15,21 +15,28 @@ spec:
           service:
             name: order-service
             port:
-              number: 8085
+              number: 8080
       - path: /api/payments
         pathType: Prefix
         backend:
           service:
             name: payment-service
             port:
-              number: 8086
+              number: 8081
       - path: /api/stocks
         pathType: Prefix
         backend:
           service:
             name: stock-service
             port:
-              number: 8087
+              number: 8082
+      - path: /kafka-ui
+        pathType: Prefix
+        backend:
+          service:
+            name: kafka-ui
+            port:
+              number: 8080
       - path: /
         pathType: Prefix
         backend:
@@ -38,12 +45,70 @@ spec:
             port:
               number: 80
 ---
-# Health check ingress with rewrite for order-service
+# Prometheus Ingress with higher priority
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: health-order-ingress
-  namespace: order-platform
+  name: prometheus-ingress
+  namespace: auchitya-platform
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/priority: "100"
+spec:
+  ingressClassName: nginx
+  rules:
+  - http:
+      paths:
+      - path: /prometheus
+        pathType: Exact
+        backend:
+          service:
+            name: prometheus-service
+            port:
+              number: 9090
+      - path: /prometheus/
+        pathType: Prefix
+        backend:
+          service:
+            name: prometheus-service
+            port:
+              number: 9090
+---
+# Grafana Ingress with higher priority
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: grafana-ingress
+  namespace: auchitya-platform
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/priority: "100"
+spec:
+  ingressClassName: nginx
+  rules:
+  - http:
+      paths:
+      - path: /grafana
+        pathType: Exact
+        backend:
+          service:
+            name: grafana
+            port:
+              number: 3000
+      - path: /grafana/
+        pathType: Prefix
+        backend:
+          service:
+            name: grafana
+            port:
+              number: 3000
+---
+# Health check for order-service
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: health-order
+  namespace: auchitya-platform
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /actuator/health
 spec:
@@ -57,14 +122,14 @@ spec:
           service:
             name: order-service
             port:
-              number: 8085
+              number: 8080
 ---
-# Health check ingress with rewrite for payment-service
+# Health check for payment-service
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: health-payment-ingress
-  namespace: order-platform
+  name: health-payment
+  namespace: auchitya-platform
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /actuator/health
 spec:
@@ -78,14 +143,14 @@ spec:
           service:
             name: payment-service
             port:
-              number: 8086
+              number: 8081
 ---
-# Health check ingress with rewrite for stock-service
+# Health check for stock-service
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: health-stock-ingress
-  namespace: order-platform
+  name: health-stock
+  namespace: auchitya-platform
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /actuator/health
 spec:
@@ -99,49 +164,4 @@ spec:
           service:
             name: stock-service
             port:
-              number: 8087
----
-# Kafka UI ingress (no rewrite needed - app configured with context path)
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: kafka-ui-ingress
-  namespace: order-platform
-spec:
-  ingressClassName: nginx
-  rules:
-  - http:
-      paths:
-      - path: /kafka-ui
-        pathType: Prefix
-        backend:
-          service:
-            name: kafka-ui
-            port:
-              number: 8080
----
-# Monitoring ingress for Prometheus and Grafana
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: monitoring-ingress
-  namespace: order-platform
-spec:
-  ingressClassName: nginx
-  rules:
-  - http:
-      paths:
-      - path: /prometheus
-        pathType: Prefix
-        backend:
-          service:
-            name: prometheus-service
-            port:
-              number: 9090
-      - path: /grafana
-        pathType: Prefix
-        backend:
-          service:
-            name: grafana
-            port:
-              number: 3000
+              number: 8082
