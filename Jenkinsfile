@@ -34,8 +34,7 @@ pipeline {
                 docker tag order-service:${BUILD_NUMBER} ${ECR_REGISTRY}/order-service:${BUILD_NUMBER}
                 docker tag payment-service:${BUILD_NUMBER} ${ECR_REGISTRY}/payment-service:${BUILD_NUMBER}
                 docker tag stock-service:${BUILD_NUMBER} ${ECR_REGISTRY}/stock-service:${BUILD_NUMBER}
-                docker tag demo-ui:${BUILD_NUMBER} ${ECR_REGISTRY}/order-service:demo-ui-${BUILD_NUMBER}
-                docker tag demo-ui:${BUILD_NUMBER} ${ECR_REGISTRY}/order-service:demo-ui
+                docker tag demo-ui:${BUILD_NUMBER} ${ECR_REGISTRY}/demo-ui:${BUILD_NUMBER}
                 '''
             }
         }
@@ -54,8 +53,7 @@ pipeline {
                     docker push ${ECR_REGISTRY}/order-service:${BUILD_NUMBER}
                     docker push ${ECR_REGISTRY}/payment-service:${BUILD_NUMBER}
                     docker push ${ECR_REGISTRY}/stock-service:${BUILD_NUMBER}
-                    docker push ${ECR_REGISTRY}/order-service:demo-ui-${BUILD_NUMBER}
-                    docker push ${ECR_REGISTRY}/order-service:demo-ui
+                    docker push ${ECR_REGISTRY}/demo-ui:${BUILD_NUMBER}
                     echo done...
                     '''
                 }
@@ -79,7 +77,7 @@ pipeline {
                         sed -i "s|image: 331867785866.dkr.ecr.us-east-1.amazonaws.com/intern-project/order-service:.*|image: ${ECR_REGISTRY}/order-service:${BUILD_NUMBER}|g" k8s/services.yaml
                         sed -i "s|image: 331867785866.dkr.ecr.us-east-1.amazonaws.com/intern-project/payment-service:.*|image: ${ECR_REGISTRY}/payment-service:${BUILD_NUMBER}|g" k8s/services.yaml
                         sed -i "s|image: 331867785866.dkr.ecr.us-east-1.amazonaws.com/intern-project/stock-service:.*|image: ${ECR_REGISTRY}/stock-service:${BUILD_NUMBER}|g" k8s/services.yaml
-                        sed -i "s|image: 331867785866.dkr.ecr.us-east-1.amazonaws.com/intern-project/demo-ui:.*|image: ${ECR_REGISTRY}/order-service:demo-ui|g" k8s/services.yaml
+                        sed -i "s|image: 331867785866.dkr.ecr.us-east-1.amazonaws.com/intern-project/demo-ui:.*|image: ${ECR_REGISTRY}/demo-ui:${BUILD_NUMBER}|g" k8s/services.yaml
                         
                         git add k8s/services.yaml
                         git commit -m "Update deployment images to version ${BUILD_NUMBER}"
