@@ -7,9 +7,9 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/auchitya-cloud/CRMservices
+    repoURL: https://github.com/auchitya-cloud/ManifestFilesForCRM
     targetRevision: main
-    path: OrderMicroservice/k8s
+    path: k8s
   destination:
     server: https://kubernetes.default.svc
     namespace: auchitya-platform
