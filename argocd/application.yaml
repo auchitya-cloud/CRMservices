@@ -1,18 +1,16 @@
-# ArgoCD Application for GitOps deployment
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: auchitya-platform
+  name: order-platform
   namespace: argocd
 spec:
   project: default
   source:
-    repoURL: https://github.com/auchitya-cloud/ManifestFilesForCRM
-    targetRevision: main
+    repoURL:https://github.com/auchitya-cloud/ManifestFilesForCRM 
     path: k8s
   destination:
     server: https://kubernetes.default.svc
-    namespace: auchitya-platform
+    namespace: order-platform
   syncPolicy:
     automated:
       prune: true
