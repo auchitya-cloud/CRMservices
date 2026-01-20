@@ -11,7 +11,7 @@ spec:
     path: k8s
   destination:
     server: https://kubernetes.default.svc
-    namespace: auchitya-platform
+    namespace: team-namespace
   syncPolicy:
     automated:
       prune: true
