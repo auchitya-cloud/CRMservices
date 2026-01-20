@@ -1,0 +1,83 @@
+# Main Ingress
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: auchitya-ingress
+  namespace: auchitya-platform
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+  ingressClassName: nginx
+  rules:
+  - http:
+      paths:
+      - path: /api/orders(/|$)(.*)
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: order-service
+            port:
+              number: 8080
+      - path: /api/payments(/|$)(.*)
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: payment-service
+            port:
+              number: 8081
+      - path: /api/stocks(/|$)(.*)
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: stock-service
+            port:
+              number: 8082
+      - path: /kafka-ui(/|$)(.*)
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: kafka-ui
+            port:
+              number: 8080
+      - path: /()(.*)
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: demo-ui
+            port:
+              number: 80
+---
+# Health check ingress with specific routing
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: health-checks
+  namespace: auchitya-platform
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /actuator/health
+spec:
+  ingressClassName: nginx
+  rules:
+  - http:
+      paths:
+      - path: /actuator/order/health
+        pathType: Exact
+        backend:
+          service:
+            name: order-service
+            port:
+              number: 8080
+      - path: /actuator/payment/health
+        pathType: Exact
+        backend:
+          service:
+            name: payment-service
+            port:
+              number: 8081
+      - path: /actuator/stock/health
+        pathType: Exact
+        backend:
+          service:
+            name: stock-service
+            port:
+              number: 8082
