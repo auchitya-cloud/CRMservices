@@ -6,7 +6,8 @@ metadata:
 spec:
   project: default
   source:
-    repoURL:https://github.com/auchitya-cloud/ManifestFilesForCRM 
+    repoURL: https://github.com/auchitya-cloud/ManifestFilesForCRM
+    targetRevision: main
     path: k8s
   destination:
     server: https://kubernetes.default.svc
