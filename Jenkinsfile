@@ -61,13 +61,13 @@ pipeline {
         }
         stage('Update K8 Files') {
             environment {
-                GIT_REPO_NAME = "ManifestFiles1"
-                GIT_USER_NAME = "balaji-510"
+                GIT_REPO_NAME = "ManifestFilesForCRM"
+                GIT_USER_NAME = "auchitya-cloud"
             }
             steps {
                 withCredentials([string(credentialsId: 'github1', variable: 'GITHUB_TOKEN')]) {
                     sh '''
-                        git clone https://${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/ManifestFiles1 manifests
+                        git clone https://${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} manifests
                         cd manifests
                         git config --global --add safe.directory "$WORKSPACE/manifests"
                         git config user.email "balaji_from_jenkins@gmail.com"
